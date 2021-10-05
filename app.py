@@ -7,8 +7,8 @@ app = Flask(__name__)
 # Variables
 smtp_server = "smtp.hostinger.com.ar"
 smtp_port = 587
-email_sender = "sfernandez@ironbox.com.ar"
-email_password = "Jupiter34"
+email_sender = "xxx@ironbox.com.ar"
+email_password = "xxx"
 
 # Generate One Time Password
 def generateOneTimePassword():

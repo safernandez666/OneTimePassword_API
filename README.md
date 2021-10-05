@@ -1,7 +1,9 @@
-# OneTimePassword_API
+# One Time Password API
 
-## Create the database with the users
+## Create the database
 
-On database folder
+On database folder run the following command.
 
-'''sqlite3 users.db < init.sql'''
+```
+sqlite3 users.db < init.sql
+```

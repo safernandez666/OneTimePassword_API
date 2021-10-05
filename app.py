@@ -7,10 +7,10 @@ from email.message import EmailMessage
 app = Flask(__name__) 
 
 # Variables
-smtp_server = "smtp.hostinger.com.ar"
+smtp_server = os.getenv('STMP_SERVER')
 smtp_port = 587
-email_sender = "xxx@ironbox.com.ar"
-email_password = "xxx"
+email_sender = os.getenv('EMAIL_SENDER')
+email_password = os.getenv('EMAIL_PASSWORD')
 
 # Generate One Time Password
 def generateOneTimePassword():

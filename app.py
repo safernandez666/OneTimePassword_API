@@ -65,7 +65,7 @@ def sendEmail(email, code):
     msg = EmailMessage()
     msg.set_content("Your One Time Passoword is: " + code)
     msg['Subject'] = f'One Time Password'
-    msg['From'] = "OTP Message <%s>" % email
+    msg['From'] = "OTP Message <%s>" % email_sender
     msg['To'] = email
     s = smtplib.SMTP(smtp_server, smtp_port)
     s.starttls()

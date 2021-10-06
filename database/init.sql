@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS user(
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 INSERT INTO user (email, code)
-    VALUES( 'sfernandez@ironbox.com.ar', 000000 );
+    VALUES( 'email@dominio.com', 000000 );
 INSERT INTO user (email, code)
-    VALUES( 'vanesacurto@gmail.com', 000000 );
+    VALUES( 'email1@dominio.com', 000000 );

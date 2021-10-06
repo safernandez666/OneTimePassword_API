@@ -12,7 +12,7 @@ smtp_server = os.getenv('STMP_SERVER')
 smtp_port = 587
 email_sender = os.getenv('EMAIL_USER')
 email_password = os.getenv('EMAIL_PASSWORD')
-timeToLease = 1 # Time to change the OTP. It's in Minutes.
+timeToLease = 5 # Time to change the OTP. It's in Minutes.
 
 # Generate One Time Password
 def generateOneTimePassword():

@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS user(
 INSERT INTO user (email, code)
     VALUES( 'sfernandez@ironbox.com.ar', 000000 );
 INSERT INTO user (email, code)
-    VALUES( 'vanesacurto@gmail.com', 555555 );
+    VALUES( 'vanesacurto@gmail.com', 000000 );

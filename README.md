@@ -47,3 +47,19 @@ curl -X POST http://localhost:5000/v1/validate \
 <p align="center">
 <img src="screenshots/imagen_3.png" width="800" >
 </p>
+
+## Create the Docker Image
+
+```
+docker build -t onetimepass:latest .
+```
+To run the API Microservice
+
+```
+docker run -p 5000:5000 \
+	-e STMP_SERVER="smtp.xxxcom.ar" \
+    -e EMAIL_USER="mail@tudominio.com" \
+    -e EMAIL_PASSWORD="pass" \
+    -e API_KEY="key" \
+    onetimepass:latest
+```

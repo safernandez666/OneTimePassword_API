@@ -59,7 +59,7 @@ To run the API Microservice
 
 ```
 docker run -p 5000:5000 \
-	-e STMP_SERVER="smtp.xxxcom.ar" \
+-e STMP_SERVER="smtp.xxxcom.ar" \
     -e EMAIL_USER="mail@tudominio.com" \
     -e EMAIL_PASSWORD="pass" \
     -e API_KEY="key" \

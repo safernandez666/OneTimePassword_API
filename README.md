@@ -24,7 +24,8 @@ Check with the user's email.
 
 curl -X GET http://localhost:5000/v1/init \
     -H 'Content-Type: application/json' \
-    -d '{"email":"sfernandez@ironbox.com.ar"}'
+    -H 'x-api-key: api_key' \
+    -d '{"email":"mail@tudominio.com"}'
 
 <p align="center">
 <img src="screenshots/imagen_1.png" width="800" >
@@ -40,7 +41,8 @@ The user must perform the POST with their email and code. The time that the code
 
 curl -X POST http://localhost:5000/v1/validate \
 -H 'Content-Type: application/json' \
--d '{"email":"sfernandez@ironbox.com.ar", "code":741130}'
+-H 'x-api-key: api_key' \
+-d '{"email":"mail@tudominio.com", "code":509877}'
 
 <p align="center">
 <img src="screenshots/imagen_3.png" width="800" >

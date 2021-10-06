@@ -9,7 +9,7 @@ from functools import wraps
 app = Flask(__name__) 
 
 # Variables
-smtp_server = os.getenv('STMP_SERVER')
+smtp_server = os.getenv('SMTP_SERVER')
 smtp_port = 587
 email_sender = os.getenv('EMAIL_USER')
 email_password = os.getenv('EMAIL_PASSWORD')
@@ -50,6 +50,7 @@ def requires_apikey(f):
 ######################################################################
 # Functions
 ######################################################################   
+
 # Generate One Time Password
 def generateOneTimePassword():
     digits="0123456789"
@@ -85,6 +86,14 @@ def delta(time, timeToLease):
         return True
     else:
         return False
+
+# Validate Email
+def validateEmail(email):
+    result = user_controller.validate(email)
+    if result:
+        return True
+    else:
+        return False
 ######################################################################
 # Routes & Services
 ######################################################################  
@@ -94,9 +103,10 @@ def delta(time, timeToLease):
 def update_otp():
     user_details = request.get_json()
     email = user_details["email"]
-    code = generateOneTimePassword()
-    result = user_controller.update_otp(code, email)
-    if result:
+    status = validateEmail(email)
+    if status:
+        code = generateOneTimePassword()
+        result = user_controller.update_otp(code, email)
         sendEmail(email, code)
         return jsonify({'message': 'The code was generated'}), 200
     else:
@@ -112,7 +122,7 @@ def validate():
     result = user_controller.validate(email)
     # Validate Code and email within delta.
     if result:
-        if ((result[2] == str(code)) and (delta(result[3],timeToLease) == True)):
+        if ((result[1] == email) and (result[2] == str(code)) and (delta(result[3],timeToLease) == True)):
             return jsonify({'message': 'The code is valid'}), 200
         else:
             return jsonify({'message': 'Bad Request'}), 404        

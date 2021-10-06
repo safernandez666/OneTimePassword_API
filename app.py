@@ -8,11 +8,11 @@ from email.message import EmailMessage
 app = Flask(__name__) 
 
 # Variables
-smtp_server = os.getenv('STMP_SERVER')
-smtp_port = os.getenv('SMTP_PORT')
-email_sender = os.getenv('EMAIL_SENDER')
-email_password = os.getenv('EMAIL_PASSWORD')
-timeToLease = 1
+smtp_server = 'smtp.xx.com.ar'
+smtp_port = 587
+email_sender = 'XX'
+email_password = 'XX'
+timeToLease = 1 # Time to change the OTP. It's in Minutes.
 
 # Generate One Time Password
 def generateOneTimePassword():
@@ -33,7 +33,6 @@ def sendEmail(email, code):
     s = smtplib.SMTP(smtp_server, smtp_port)
     s.starttls()
     s.login(email_sender, email_password)
-    #s.sendmail(email,email_sender,msg)
     s.send_message(msg)
     s.quit()
 
@@ -80,4 +79,4 @@ def validate():
     return jsonify({'message': 'This email dont exist'}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000)

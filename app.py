@@ -1,16 +1,18 @@
 from flask import Flask, jsonify, request
 import user_controller
 import os, math, random, smtplib
+from datetime import datetime
 # Import the email modules we'll need
 from email.message import EmailMessage
 
 app = Flask(__name__) 
 
 # Variables
-smtp_server = os.getenv('STMP_SERVER')
+smtp_server = "smtp.hostinger.com.ar"
 smtp_port = 587
-email_sender = os.getenv('EMAIL_SENDER')
-email_password = os.getenv('EMAIL_PASSWORD')
+email_sender = "sfernandez@ironbox.com.ar"
+email_password = "Jupiter34"
+timeToLease = 9999999999
 
 # Generate One Time Password
 def generateOneTimePassword():
@@ -35,6 +37,20 @@ def sendEmail(email, code):
     s.send_message(msg)
     s.quit()
 
+# Delta
+def delta(time, timeToLease):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Convert to Data Object
+    d1 = datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
+    d2 = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+    time_delta = (d1 - d2)
+    total_seconds = time_delta.total_seconds()
+    minutes = total_seconds/60
+    if minutes <= timeToLease:
+        return True
+    else:
+        return False
+
 # Iniciate Process
 @app.route("/v1/init", methods=["GET"])
 def update_otp():
@@ -55,12 +71,12 @@ def validate():
     email = user_details["email"]
     code = user_details["code"]
     result = user_controller.validate(email)
-    # Validate Code and email
+    # Validate Code and email within delta.
     if result:
-        if (result[2] == str(code)):
+        if ((result[2] == str(code)) and (delta(result[3],timeToLease) == True)):
             return jsonify({'message': 'The code is valid'}), 200
         else:
-            return jsonify({'message': 'The code is invalid'}), 404        
+            return jsonify({'message': 'Bad Request'}), 404        
     return jsonify({'message': 'This email dont exist'}), 404
 
 if __name__ == '__main__':

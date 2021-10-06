@@ -2,3 +2,4 @@ Flask
 datetime 
 PyJWT 
 python-dotenv
+flask-expects-json

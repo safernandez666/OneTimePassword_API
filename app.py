@@ -8,14 +8,15 @@ from functools import wraps
 
 app = Flask(__name__) 
 
-# Variables
+######################################################################
+# Variables. Check .env for local propose
+######################################################################
 smtp_server = os.getenv('SMTP_SERVER')
 smtp_port = 587
 email_sender = os.getenv('EMAIL_USER')
 email_password = os.getenv('EMAIL_PASSWORD')
 timeToLease = 5 # Time to change the OTP. It's in Minutes.
 app.config['API_KEY'] = os.getenv('API_KEY', None)
-
 ######################################################################
 # HTTP Error Handlers
 ######################################################################
@@ -24,7 +25,6 @@ def not_authorized(e):
     """ Respose sent back when not autorized """
     return jsonify(status=401, error='Not Authorized',
                    message='You are authorized to access the URL requested.'), 401
-
 ######################################################################
 # Check Auth: Add your autorization code here
 ######################################################################
@@ -33,7 +33,6 @@ def check_auth():
     if app.config['API_KEY']:
         return app.config['API_KEY'] == request.headers.get('X-Api-Key')
     return False
-
 ######################################################################
 # Requires API Key: Decorator function to add secuity to any call
 ######################################################################
@@ -48,6 +47,36 @@ def requires_apikey(f):
             abort(401)
     return decorated
 ######################################################################
+# Validate the Parameters Email & Code
+######################################################################
+def required_params(required):
+    def decorator(fn):
+
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            _json = request.get_json()
+            missing = [r for r in required.keys()
+                       if r not in _json]
+            if missing:
+                response = {
+                    "status": "error",
+                    "message": "Request JSON is missing some required params",
+                    "missing": missing
+                }
+                return jsonify(response), 400
+            wrong_types = [r for r in required.keys()
+                           if not isinstance(_json[r], required[r])]
+            if wrong_types:
+                response = {
+                    "status": "error",
+                    "message": "Data types in the request JSON doesn't match the required format",
+                    "param_types": {k: str(v) for k, v in required.items()}
+                }
+                return jsonify(response), 400
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
+######################################################################
 # Functions
 ######################################################################   
 
@@ -58,7 +87,6 @@ def generateOneTimePassword():
     for i in range(6):
         OTP+=digits[math.floor(random.random()*10)]
     return OTP
-
 # Send Email
 def sendEmail(email, code):
     # Create a text/plain message
@@ -72,7 +100,6 @@ def sendEmail(email, code):
     s.login(email_sender, email_password)
     s.send_message(msg)
     s.quit()
-
 # Delta
 def delta(time, timeToLease):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -86,7 +113,6 @@ def delta(time, timeToLease):
         return True
     else:
         return False
-
 # Validate Email
 def validateEmail(email):
     result = user_controller.validate(email)
@@ -100,6 +126,7 @@ def validateEmail(email):
 # Iniciate Process
 @app.route("/v1/init", methods=["GET"])
 @requires_apikey
+@required_params({"email": str})
 def update_otp():
     user_details = request.get_json()
     email = user_details["email"]
@@ -111,10 +138,10 @@ def update_otp():
         return jsonify({'message': 'The code was generated'}), 200
     else:
         return jsonify({'message': 'This email dont exist'}), 404        
-
 # Validete email & Code
 @app.route("/v1/validate", methods=["POST"])
 @requires_apikey
+@required_params({"email": str, "code": int})
 def validate(): 
     user_details = request.get_json()
     email = user_details["email"]
@@ -125,7 +152,7 @@ def validate():
         if ((result[1] == email) and (result[2] == str(code)) and (delta(result[3],timeToLease) == True)):
             return jsonify({'message': 'The code is valid'}), 200
         else:
-            return jsonify({'message': 'Bad Request'}), 404        
+            return jsonify({'message': 'Bad Request'}), 404                
     return jsonify({'message': 'This email dont exist'}), 404
 ######################################################################
 # Main Program

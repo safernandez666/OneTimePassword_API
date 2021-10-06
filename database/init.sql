@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS user(
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        email INTEGER, 
+        email TEXT, 
         code TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );

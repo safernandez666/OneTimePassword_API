@@ -68,5 +68,6 @@ onetimepass:latest
 
 ## To Do
 
-Add SSL
-Add JWT
+✔️ Add SSL
+✔️ Add JWT
+✔️ Active Directory Integration

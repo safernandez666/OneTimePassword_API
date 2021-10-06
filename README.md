@@ -12,6 +12,14 @@ sqlite3 users.db < init.sql
 1. http://localhost:5000/v1/init [GET]
 2. http://localhost:5000/v1/validate [POST]
 
+## API OTP Flow
+
+<p align="center">
+<img src="screenshots/Flow.png" width="800" >
+</p>
+
+## Steps
+
 Check with the user's email.
 
 curl -X GET http://localhost:5000/v1/init \

@@ -27,6 +27,8 @@ curl -X GET http://localhost:5000/v1/init \
     -H 'x-api-key: api_key' \
     -d '{"email":"mail@tudominio.com"}'
 
+📝 ***Remember:*** *The email must be uploaded to the database.*
+
 <p align="center">
 <img src="screenshots/imagen_1.png" width="800" >
 </p>

@@ -48,7 +48,9 @@ curl -X POST http://localhost:5000/v1/validate \
 <img src="screenshots/imagen_3.png" width="800" >
 </p>
 
-## Create the Docker Image
+## Create & Run the Docker Container
+
+Create the image with this command
 
 ```
 docker build -t onetimepass:latest .
@@ -63,3 +65,8 @@ docker run -p 5000:5000 \
     -e API_KEY="key" \
     onetimepass:latest
 ```
+
+## To Do
+
+Add SSL
+Add JWT

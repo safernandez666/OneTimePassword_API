@@ -1,6 +1,6 @@
 # One Time Password API
 
-[![Alt text](https://img.youtube.com/vi/Y6y00CdzcHE/0.jpg)](https://www.youtube.com/watch?v=Y6y00CdzcHE)
+[![Watch the video]](https://youtu.be/Y6y00CdzcHE)
 
 ## Create the database
 

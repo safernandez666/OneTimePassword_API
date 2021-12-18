@@ -1,10 +1,8 @@
 CREATE TABLE IF NOT EXISTS user(
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         email TEXT, 
+        password TEXT,
         code TEXT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        public_id INTEGER
     );
-INSERT INTO user (email, code)
-    VALUES( 'email@dominio.com', 000000 );
-INSERT INTO user (email, code)
-    VALUES( 'email1@dominio.com', 000000 );

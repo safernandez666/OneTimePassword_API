@@ -1,9 +1,8 @@
-from flask import Flask, jsonify, request, abort
-import user_controller
-import os, math, random, smtplib
-from datetime import datetime
-# Import the email modules we'll need
-from email.message import EmailMessage
+from flask import Flask, jsonify, request, abort, make_response
+import jwt
+import user_controller, functions
+import os, jwt, uuid, datetime
+from datetime import date, datetime, time, timedelta
 from functools import wraps
 
 app = Flask(__name__) 
@@ -11,12 +10,9 @@ app = Flask(__name__)
 ######################################################################
 # Variables. Check .env for local propose
 ######################################################################
-smtp_server = os.getenv('SMTP_SERVER')
-smtp_port = 587
-email_sender = os.getenv('EMAIL_USER')
-email_password = os.getenv('EMAIL_PASSWORD')
-timeToLease = 5 # Time to change the OTP. It's in Minutes.
 app.config['API_KEY'] = os.getenv('API_KEY', None)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', None)
+
 ######################################################################
 # HTTP Error Handlers
 ######################################################################
@@ -25,6 +21,7 @@ def not_authorized(e):
     """ Respose sent back when not autorized """
     return jsonify(status=401, error='Not Authorized',
                    message='You are authorized to access the URL requested.'), 401
+
 ######################################################################
 # Check Auth: Add your autorization code here
 ######################################################################
@@ -33,8 +30,9 @@ def check_auth():
     if app.config['API_KEY']:
         return app.config['API_KEY'] == request.headers.get('X-Api-Key')
     return False
+
 ######################################################################
-# Requires API Key: Decorator function to add secuity to any call
+#   Requires API Key: Decorator function to add secuity to any call  #
 ######################################################################
 def requires_apikey(f):
     """ Decorator function to require API Key """
@@ -46,12 +44,36 @@ def requires_apikey(f):
         else:
             abort(401)
     return decorated
+
 ######################################################################
-# Validate the Parameters Email & Code
+#   Requires Token: Decorator function to add secuity to any call    #
+######################################################################
+def token_required(f):
+   @wraps(f)
+   def decorator(*args, **kwargs):
+
+      token = None
+
+      if 'x-access-tokens' in request.headers:
+         token = request.headers['x-access-tokens']
+
+      if not token:
+         return jsonify({'message': 'a valid token is missing'})
+
+      try:
+         data=jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256', ])
+         current_user = user_controller.validatePublicId(data['public_id'])
+      except:
+         return jsonify({'message': 'token is invalid'})
+
+      return f(current_user, *args, **kwargs)
+   return decorator
+
+######################################################################
+#                     Validate the Parameters                        #
 ######################################################################
 def required_params(required):
     def decorator(fn):
-
         @wraps(fn)
         def wrapper(*args, **kwargs):
             _json = request.get_json()
@@ -76,86 +98,90 @@ def required_params(required):
             return fn(*args, **kwargs)
         return wrapper
     return decorator
-######################################################################
-# Functions
-######################################################################   
 
-# Generate One Time Password
-def generateOneTimePassword():
-    digits="0123456789"
-    OTP=""
-    for i in range(6):
-        OTP+=digits[math.floor(random.random()*10)]
-    return OTP
-# Send Email
-def sendEmail(email, code):
-    # Create a text/plain message
-    msg = EmailMessage()
-    msg.set_content("Your One Time Passoword is: " + code)
-    msg['Subject'] = f'One Time Password'
-    msg['From'] = "OTP Message <%s>" % email_sender
-    msg['To'] = email
-    s = smtplib.SMTP(smtp_server, smtp_port)
-    s.starttls()
-    s.login(email_sender, email_password)
-    s.send_message(msg)
-    s.quit()
-# Delta
-def delta(time, timeToLease):
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # Convert to Data Object
-    d1 = datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
-    d2 = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-    time_delta = (d1 - d2)
-    total_seconds = time_delta.total_seconds()
-    minutes = total_seconds/60
-    if minutes <= timeToLease:
-        return True
-    else:
-        return False
-# Validate Email
-def validateEmail(email):
-    result = user_controller.validate(email)
-    if result:
-        return True
-    else:
-        return False
 ######################################################################
 # Routes & Services
 ######################################################################  
-# Iniciate Process
-@app.route("/v1/init", methods=["GET"])
+
+# Singup
+@app.route('/v1/singup', methods =['POST'])
 @requires_apikey
-@required_params({"email": str})
-def update_otp():
+@required_params({"email": str, "password": str})
+def signup():
     user_details = request.get_json()
-    email = user_details["email"]
-    status = validateEmail(email)
-    if status:
-        code = generateOneTimePassword()
-        result = user_controller.update_otp(code, email)
-        sendEmail(email, code)
+    email, password = user_details["email"], user_details["password"]
+    # checking for existing user
+    user = user_controller.validate(email)
+    if not user:
+        if user_controller.insert(email, password, str(uuid.uuid4())):
+            return jsonify({'message': 'Succesfull Register'}), 200
+        else:  
+            return jsonify({'message': 'Error on the Insert'}), 401 
+    else:
+        # returns 202 if user already exists
+        return jsonify({'message': 'This User Exist, please Login'}), 202   
+
+# Login
+@app.route('/v1/login', methods =['POST'])
+@requires_apikey
+@required_params({"email": str, "password": str})
+def login():
+    user_details = request.get_json()
+    email, password = user_details["email"], user_details["password"]   
+    # checking for existing user and the Password
+    result = user_controller.validatePassword(email, password)
+    if not result:
+        # returns 401 if any email or / and password is missing
+        return jsonify({'message': 'Could not Verify'}), 401  
+    # Check User & Password from DDBB vs Paramaters
+    if result:
+        # generates the JWT Token
+        token = jwt.encode({'public_id': result[5], 'exp' : datetime.combine(date.today(), time(23, 55)) + timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm='HS256')  
+        return jsonify({'token' : token}) 
+    else:  
+        # returns 401 if any email or / and password is missing
+        return jsonify({'message': 'Could not Verify'}), 401     
+
+# Iniciate Process with Token
+@app.route("/v1/init", methods=["GET"])
+@required_params({"email": str, "password": str})
+@token_required
+def update_otp(current_user):
+    user_details = request.get_json()
+    email, password = user_details["email"], user_details["password"]   
+    # checking for existing user and the Password
+    result = user_controller.validatePassword(email, password)
+    if not result:
+        # returns 401 if any email or / and password is missing
+        return jsonify({'message': 'Could not Verify'}), 401 
+    # Generate OTP
+    if current_user[5] == result[5]:
+        code = functions.generateOneTimePassword()
+        user_controller.update_otp(code, current_user[5])
+        functions.sendEmail(current_user[1], code)
         return jsonify({'message': 'The code was generated'}), 200
     else:
-        return jsonify({'message': 'This email dont exist'}), 404        
-# Validete email & Code
+        return jsonify({'message': 'Something its wrong.'}), 404   
+
+# Validete email & Code with Token
 @app.route("/v1/validate", methods=["POST"])
-@requires_apikey
-@required_params({"email": str, "code": int})
-def validate(): 
+@token_required
+@required_params({"email": str, "password": str, "code": int})
+def validate(current_user): 
     user_details = request.get_json()
-    email = user_details["email"]
-    code = user_details["code"]
-    result = user_controller.validate(email)
-    # Validate Code and email within delta.
+    email, password = user_details["email"], user_details["password"]   
+    # checking for existing user and the Password
+    result = user_controller.validatePassword(email, password)
+    # Validate Code and Public_Id within delta.
     if result:
-        if ((result[1] == email) and (result[2] == str(code)) and (delta(result[3],timeToLease) == True)):
+        if (current_user[5] == result[5] and result[3] == str(user_details["code"])):
             return jsonify({'message': 'The code is valid'}), 200
         else:
             return jsonify({'message': 'Bad Request'}), 404                
     return jsonify({'message': 'This email dont exist'}), 404
+
 ######################################################################
 # Main Program
 ######################################################################  
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=8080)

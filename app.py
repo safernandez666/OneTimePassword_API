@@ -144,18 +144,13 @@ def login():
 
 # Iniciate Process with Token
 @app.route("/v1/init", methods=["GET"])
-@required_params({"email": str, "password": str})
 @token_required
 def update_otp(current_user):
-    user_details = request.get_json()
-    email, password = user_details["email"], user_details["password"]   
-    # checking for existing user and the Password
-    result = user_controller.validatePassword(email, password)
-    if not result:
+    if not current_user:
         # returns 401 if any email or / and password is missing
         return jsonify({'message': 'Could not Verify'}), 401 
     # Generate OTP
-    if current_user[5] == result[5]:
+    if current_user:
         code = functions.generateOneTimePassword()
         user_controller.update_otp(code, current_user[5])
         functions.sendEmail(current_user[1], code)
@@ -166,15 +161,12 @@ def update_otp(current_user):
 # Validete email & Code with Token
 @app.route("/v1/validate", methods=["POST"])
 @token_required
-@required_params({"email": str, "password": str, "code": int})
+@required_params({"code": int})
 def validate(current_user): 
     user_details = request.get_json()
-    email, password = user_details["email"], user_details["password"]   
-    # checking for existing user and the Password
-    result = user_controller.validatePassword(email, password)
     # Validate Code and Public_Id within delta.
-    if result:
-        if (current_user[5] == result[5] and result[3] == str(user_details["code"])):
+    if current_user:
+        if (current_user[3] == str(user_details["code"])):
             return jsonify({'message': 'The code is valid'}), 200
         else:
             return jsonify({'message': 'Bad Request'}), 404                

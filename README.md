@@ -1,6 +1,6 @@
 # One Time Password API
 
-[![Watch the video]](https://youtu.be/Y6y00CdzcHE)
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/Y6y00CdzcHE/0.jpg)](http://www.youtube.com/watch?v=Y6y00CdzcHE "API One Time Password Passwordless")
 
 ## Create the database
 

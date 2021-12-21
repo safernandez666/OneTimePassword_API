@@ -30,6 +30,11 @@ curl -X POST http://localhost:8080/v1/singup \
     -H 'x-api-key: tuapikey' \
     -d '{"email":"mail@tudominio.com", "password":"tupass"}'
 ```
+
+<p align="center">
+<img src="screenshots/imagen_1_singup.png" width="800" >
+</p>
+
 Login
 ```
 curl -X POST http://localhost:8080/v1/login \
@@ -37,13 +42,28 @@ curl -X POST http://localhost:8080/v1/login \
     -H 'x-api-key: tuapikey' \
     -d '{"email":"mail@tudominio.com", "password":"tupass"}'
 ```
+<p align="center">
+<img src="screenshots/imagen_2_login.png" width="800" >
+</p>
 
 Star the flow.
 ```
 curl -X GET http://localhost:8080/v1/init \
     -H 'Content-Type: application/json' \
     -H 'x-access-tokens: tutoken'
+
 ```
+
+<p align="center">
+<img src="screenshots/imagen_3_init.png" width="800" >
+</p>
+
+The Email. If the user is in the database, an email will be sent with the OTP code.
+
+<p align="center">
+<img src="screenshots/imagen_4_email.png" width="800" >
+</p>
+
 Validate the Code.
 ```
 curl -X POST http://localhost:8080/v1/validate \
@@ -52,31 +72,11 @@ curl -X POST http://localhost:8080/v1/validate \
     -d '{"code":"tucode"}'
 ```
 
-📝 ***Remember:*** *The email must be uploaded to the database.*
-
 <p align="center">
-<img src="screenshots/imagen_1.png" width="800" >
-</p>
-
-If the user is in the database, an email will be sent with the OTP code.
-
-<p align="center">
-<img src="screenshots/imagen_2.png" width="800" >
+<img src="screenshots/imagen_5_validate.png" width="800" >
 </p>
 
 The user must perform the POST with their code. The time that the code is alive depends on the variable ***timeToLease*** on the token constractor
-
-Validate the Code.
-```
-curl -X POST http://localhost:8080/v1/validate \
-    -H 'Content-Type: application/json' \
-    -H 'x-api-key: tutoken' \
-    -d '{"code":"tucode"}'
-```
-
-<p align="center">
-<img src="screenshots/imagen_3.png" width="800" >
-</p>
 
 ## Create & Run the Docker Container
 

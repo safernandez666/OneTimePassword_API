@@ -1,6 +1,6 @@
 # One Time Password API
 
-[[Watch the video]](https://youtu.be/Y6y00CdzcHE?t=35s)
+[[Video]](https://youtu.be/Y6y00CdzcHE?t=35s)
 
 ## Create the database
 
@@ -51,7 +51,6 @@ Star the flow.
 curl -X GET http://localhost:8080/v1/init \
     -H 'Content-Type: application/json' \
     -H 'x-access-tokens: tutoken'
-
 ```
 
 <p align="center">

@@ -1,6 +1,6 @@
 # One Time Password API
 
-[![Watch the video]](https://youtu.be/Y6y00CdzcHE?t=35s)
+[[Watch the video]](https://youtu.be/Y6y00CdzcHE?t=35s)
 
 ## Create the database
 
@@ -70,6 +70,7 @@ docker run -p 5000:5000 \
 -e EMAIL_USER="mail@tudominio.com" \
 -e EMAIL_PASSWORD="pass" \
 -e API_KEY="key" \
+-e SECRET_KEY="key"
 onetimepass:latest
 ```
 

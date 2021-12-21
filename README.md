@@ -46,7 +46,7 @@ curl -X POST http://localhost:8080/v1/login \
 <img src="screenshots/imagen_2_login.png" width="800" >
 </p>
 
-Star the flow.
+Start the flow.
 ```
 curl -X GET http://localhost:8080/v1/init \
     -H 'Content-Type: application/json' \

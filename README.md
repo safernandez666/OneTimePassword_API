@@ -23,12 +23,33 @@ sqlite3 users.db < init.sql
 
 ## Steps
 
-Check with the user's email.
+Singup the user.
 ```
-curl -X GET http://localhost:5000/v1/init \
+curl -X POST http://localhost:8080/v1/singup \
     -H 'Content-Type: application/json' \
-    -H 'x-api-key: api_key' \
-    -d '{"email":"mail@tudominio.com"}'
+    -H 'x-api-key: tuapikey' \
+    -d '{"email":"mail@tudominio.com", "password":"tupass"}'
+```
+Login
+```
+curl -X POST http://localhost:8080/v1/login \
+    -H 'Content-Type: application/json' \
+    -H 'x-api-key: tuapikey' \
+    -d '{"email":"mail@tudominio.com", "password":"tupass"}'
+```
+
+Star the flow.
+```
+curl -X GET http://localhost:8080/v1/init \
+    -H 'Content-Type: application/json' \
+    -H 'x-access-tokens: tutoken'
+```
+Validate the Code.
+```
+curl -X POST http://localhost:8080/v1/validate \
+    -H 'Content-Type: application/json' \
+    -H 'x-api-key: tutoken' \
+    -d '{"code":"tucode"}'
 ```
 
 📝 ***Remember:*** *The email must be uploaded to the database.*
@@ -43,12 +64,14 @@ If the user is in the database, an email will be sent with the OTP code.
 <img src="screenshots/imagen_2.png" width="800" >
 </p>
 
-The user must perform the POST with their email and code. The time that the code is alive depends on the variable ***timeToLease***
+The user must perform the POST with their code. The time that the code is alive depends on the variable ***timeToLease*** on the token constractor
+
+Validate the Code.
 ```
-curl -X POST http://localhost:5000/v1/validate \
--H 'Content-Type: application/json' \
--H 'x-api-key: api_key' \
--d '{"email":"mail@tudominio.com", "code":509877}'
+curl -X POST http://localhost:8080/v1/validate \
+    -H 'Content-Type: application/json' \
+    -H 'x-api-key: tutoken' \
+    -d '{"code":"tucode"}'
 ```
 
 <p align="center">
@@ -77,5 +100,4 @@ onetimepass:latest
 ## To Do
 
 ✔️ Add SSL
-✔️ Add JWT
-✔️ Active Directory Integration
+✔️ Active Directory Integration o CIAM

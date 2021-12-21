@@ -4,6 +4,7 @@ import user_controller, functions
 import os, jwt, uuid, datetime
 from datetime import date, datetime, time, timedelta
 from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__) 
 
@@ -51,21 +52,16 @@ def requires_apikey(f):
 def token_required(f):
    @wraps(f)
    def decorator(*args, **kwargs):
-
       token = None
-
       if 'x-access-tokens' in request.headers:
          token = request.headers['x-access-tokens']
-
       if not token:
          return jsonify({'message': 'a valid token is missing'})
-
       try:
          data=jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256', ])
          current_user = user_controller.validatePublicId(data['public_id'])
       except:
          return jsonify({'message': 'token is invalid'})
-
       return f(current_user, *args, **kwargs)
    return decorator
 
@@ -113,6 +109,7 @@ def signup():
     # checking for existing user
     user = user_controller.validate(email)
     if not user:
+        password = generate_password_hash(password, "sha256")
         if user_controller.insert(email, password, str(uuid.uuid4())):
             return jsonify({'message': 'Succesfull Register'}), 200
         else:  
@@ -129,14 +126,14 @@ def login():
     user_details = request.get_json()
     email, password = user_details["email"], user_details["password"]   
     # checking for existing user and the Password
-    result = user_controller.validatePassword(email, password)
+    result = user_controller.validate(email)
     if not result:
         # returns 401 if any email or / and password is missing
         return jsonify({'message': 'Could not Verify'}), 401  
     # Check User & Password from DDBB vs Paramaters
-    if result:
+    if check_password_hash(result[2], password):
         # generates the JWT Token
-        token = jwt.encode({'public_id': result[5], 'exp' : datetime.combine(date.today(), time(23, 55)) + timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm='HS256')  
+        token = jwt.encode({'public_id': result[5], 'exp' : datetime.combine(date.today(), time(23, 55)) + timedelta(minutes=5)}, app.config['SECRET_KEY'], algorithm='HS256')  
         return jsonify({'token' : token}) 
     else:  
         # returns 401 if any email or / and password is missing

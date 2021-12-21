@@ -1,7 +1,6 @@
 from db import get_db
 from datetime import datetime
 
-
 def update_otp(code, public_id):
     db = get_db()
     cursor = db.cursor()
@@ -18,7 +17,7 @@ def validatePublicId (id):
     cursor.execute(query, [id])
     return cursor.fetchone()
 
-# Select User by Email
+# Select User by Email. Search if the User exist.
 def validate (email): 
     db = get_db()
     cursor = db.cursor()

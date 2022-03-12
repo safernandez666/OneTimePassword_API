@@ -3,3 +3,5 @@ datetime
 PyJWT 
 python-dotenv
 flask-expects-json
+uuid
+jwt

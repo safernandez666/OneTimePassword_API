@@ -6,7 +6,7 @@ from email.message import EmailMessage
 #          Variables. Check .env for local propose                   #
 ######################################################################
 smtp_server = os.getenv('SMTP_SERVER')
-smtp_port = 587
+smtp_port = 465
 email_sender = os.getenv('EMAIL_USER')
 email_password = os.getenv('EMAIL_PASSWORD')
 ######################################################################

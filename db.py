@@ -1,5 +1,5 @@
 import sqlite3
-DATABASE_NAME = r"./database/users.db"
+DATABASE_NAME = r"./users.db"
 
 
 def get_db():

@@ -1,0 +1,12 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "Local",
+            "group": "Local",
+            "database": "${workspaceFolder:OneTimePassword_API}/users.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

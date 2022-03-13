@@ -7,13 +7,13 @@
 On database folder run the following command.
 
 ```
-sqlite3 users.db < init.sql
+sqlite3 users.db < database/init.sql
 ```
 ## Request
-1. http://localhost:5000/v1/singup [POST]
-2. http://localhost:5000/v1/login [POST]
-3. http://localhost:5000/v1/init [GET]
-4. http://localhost:5000/v1/validate [POST]
+1. http://localhost:8080/v1/singup [POST]
+2. http://localhost:8080/v1/login [POST]
+3. http://localhost:8080/v1/init [GET]
+4. http://localhost:8080/v1/validate [POST]
 
 ## API OTP Flow
 

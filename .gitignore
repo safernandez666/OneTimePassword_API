@@ -1,3 +1,5 @@
 .env
 users.db
 Local.session
+__pycache__
+.vscode
